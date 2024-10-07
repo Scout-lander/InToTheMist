@@ -56,6 +56,12 @@ namespace AlterunaFPS
 			JumpAndGravity();
 			GroundedCheck();
 			Move();
+			
+			// Sync the animations for arms and body
+			if (_hasAnimator && _hasFirstPersonAnimator)
+			{
+				SyncAnimators();
+			}
 		}
 
 		private void LateUpdate()

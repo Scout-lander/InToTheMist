@@ -14,18 +14,28 @@ namespace AlterunaFPS
 		private int _animIDGunFire;
 		private int _animIDGunReload;
 		
-		private Animator _animator;
+		[SerializeField]private Animator _animator;
+		[SerializeField] private Animator _firstPersonAnimator; // First-person arms animator
 		
 		private bool _hasAnimator;
+		private bool _hasFirstPersonAnimator;
 
 		private void InitialiseAnimations()
 		{
-			_hasAnimator = TryGetComponent(out _animator);
+			if (_animator == null || _firstPersonAnimator == null)
+			{
+				Debug.LogError("Animator or FirstPersonAnimator is not assigned!");
+				return;
+			}
+			_firstPersonAnimator.Play("Idle");
 			
+			_hasAnimator = true;
+			_hasFirstPersonAnimator = true;
+
 			// reset our timeouts on start
 			_jumpTimeoutDelta = JumpTimeout;
 			_fallTimeoutDelta = FallTimeout;
-			
+
 			// setup animation IDs
 			_animIDSpeed = Animator.StringToHash("Speed");
 			_animIDGrounded = Animator.StringToHash("Grounded");
@@ -37,6 +47,21 @@ namespace AlterunaFPS
 
 			_animIDGunFire = Animator.StringToHash("Fire");
 			_animIDGunReload = Animator.StringToHash("Reload");
+		}
+
+		// Sync animations for both body and arms
+		private void SyncAnimators()
+		{
+			if (_hasAnimator && _hasFirstPersonAnimator)
+			{
+				_firstPersonAnimator.SetFloat(_animIDSpeed, _animator.GetFloat(_animIDSpeed));
+				_firstPersonAnimator.SetBool(_animIDGrounded, _animator.GetBool(_animIDGrounded));
+				_firstPersonAnimator.SetBool(_animIDJump, _animator.GetBool(_animIDJump));
+				_firstPersonAnimator.SetBool(_animIDFreeFall, _animator.GetBool(_animIDFreeFall));
+				_firstPersonAnimator.SetFloat(_animIDMotionSpeed, _animator.GetFloat(_animIDMotionSpeed));
+				_firstPersonAnimator.SetFloat(_animIDHeadLookX, _animator.GetFloat(_animIDHeadLookX));
+				_firstPersonAnimator.SetFloat(_animIDHeadLookY, _animator.GetFloat(_animIDHeadLookY));
+			}
 		}
 		
 		private void OnFootstep(AnimationEvent animationEvent)
@@ -58,6 +83,5 @@ namespace AlterunaFPS
 				AudioSource.PlayClipAtPoint(LandingAudioClip, transform.TransformPoint(_controller.center), FootstepAudioVolume);
 			}
 		}
-		
 	}
 }

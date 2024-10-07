@@ -71,7 +71,7 @@ namespace AlterunaFPS
 				QueryTriggerInteraction.Ignore);
 
 			// update animator if using character
-			if (_hasAnimator)
+			if (_animator)
 			{
 				_animator.SetBool(_animIDGrounded, Grounded);
 			}
@@ -162,10 +162,20 @@ namespace AlterunaFPS
 			                 new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
 
 			// update animator if using character
-			if (_hasAnimator)
+			if (_animator)
 			{
 				_animator.SetFloat(_animIDSpeed, _animationBlend);
 				_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+			}
+
+			// Update both animators with movement values
+			if (_hasAnimator && _hasFirstPersonAnimator)
+			{
+				_animator.SetFloat(_animIDSpeed, _animationBlend);
+				_firstPersonAnimator.SetFloat(_animIDSpeed, _animationBlend);
+
+				_animator.SetFloat(_animIDMotionSpeed, inputMagnitude);
+				_firstPersonAnimator.SetFloat(_animIDMotionSpeed, inputMagnitude);
 			}
 		}
 
@@ -177,7 +187,7 @@ namespace AlterunaFPS
 				_fallTimeoutDelta = FallTimeout;
 
 				// update animator if using character
-				if (_hasAnimator)
+				if (_animator)
 				{
 					_animator.SetBool(_animIDJump, false);
 					_animator.SetBool(_animIDFreeFall, false);
@@ -196,7 +206,7 @@ namespace AlterunaFPS
 					_verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
 
 					// update animator if using character
-					if (_hasAnimator)
+					if (_animator)
 					{
 						_animator.SetBool(_animIDJump, true);
 					}
@@ -221,7 +231,7 @@ namespace AlterunaFPS
 				else
 				{
 					// update animator if using character
-					if (_hasAnimator)
+					if (_animator)
 					{
 						_animator.SetBool(_animIDFreeFall, true);
 					}
